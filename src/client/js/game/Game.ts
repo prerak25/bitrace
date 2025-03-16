@@ -1,11 +1,15 @@
 import * as THREE from 'three';
 import { Car } from '../models/Car';
+import { Controls } from './Controls';
+import { Track } from '../models/Track';
 
 export class Game {
     private scene: THREE.Scene;
     private camera: THREE.PerspectiveCamera;
     private renderer: THREE.WebGLRenderer;
     private car: Car;
+    private track: Track;
+    private controls: Controls;
 
     constructor() {
         this.scene = new THREE.Scene();
@@ -39,9 +43,19 @@ export class Game {
         this.car = new Car('#ff0000');
         this.scene.add(this.car.mesh);
 
-        // Update camera position for better view
-        this.camera.position.set(5, 3, 5);
-        this.camera.lookAt(0, 0, 0);
+        // Create and add track
+        this.track = new Track();
+        this.scene.add(this.track.mesh);
+
+        // Position car at start line and rotate to face the right direction
+        if (this.car) {
+            this.car.mesh.position.set(0, 0.5, 15); // Moved further forward on track
+            this.car.mesh.rotation.y = 0; // Face forward along track
+        }
+
+        // Initial camera setup - lower and closer to rear
+        this.camera.position.set(0, 3, 25);
+        this.camera.lookAt(0, 1, 0);
 
         // Add stronger lighting for better visibility
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
@@ -63,6 +77,8 @@ export class Game {
         // Handle window resizing
         window.addEventListener('resize', this.onWindowResize.bind(this), false);
 
+        this.controls = new Controls();
+
         // Start the animation loop
         this.animate();
     }
@@ -76,9 +92,20 @@ export class Game {
     private animate(): void {
         requestAnimationFrame(this.animate.bind(this));
 
-        // Add a small rotation to see the car better
         if (this.car) {
-            this.car.mesh.rotation.y += 0.01;
+            this.car.update(this.controls);
+
+            // Update camera to follow car from a lower, closer position
+            const cameraOffset = new THREE.Vector3(0, 2, 6);
+            const carPosition = this.car.mesh.position.clone();
+            const cameraTarget = carPosition.clone();
+            cameraTarget.y += 1;
+            
+            const carRotation = this.car.mesh.rotation.y;
+            cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), carRotation);
+            
+            this.camera.position.copy(carPosition).add(cameraOffset);
+            this.camera.lookAt(cameraTarget);
         }
 
         this.renderer.render(this.scene, this.camera);
