@@ -1,0 +1,31 @@
+{
+  "name": "bitrace",
+  "version": "1.0.0",
+  "description": "A voxel-based F1-style racing game",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --open",
+    "build": "webpack"
+  },
+  "keywords": [
+    "game",
+    "racing",
+    "voxel",
+    "threejs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1",
+    "three": "^0.162.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.174.0",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.2",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.2.0"
+  }
+}
